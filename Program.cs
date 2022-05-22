@@ -1,2 +1,11 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿
+namespace Aerohockey;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Game game = new Game();
+        game.StartGame();
+    }
+}
