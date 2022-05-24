@@ -9,6 +9,8 @@ public class Game
 	public const int WINDOW_X = 800;
 	public const int WINDOW_Y = 600;
 
+	private const int LosesToLose = 1;
+
 	private Player Player1;
 	private Player Player2;
 
@@ -23,13 +25,13 @@ public class Game
 	{
 		window = new (new VideoMode(WINDOW_X, WINDOW_Y), "Air Hockey");
 
-		orb = new(new(WINDOW_X/2, WINDOW_Y / 2));
-
 		Controls player1Controls = new Controls(Keyboard.Key.W, Keyboard.Key.S);
 		Player1 = new(new(50, WINDOW_Y / 2), player1Controls);
 
 		Controls player2Controls = new Controls(Keyboard.Key.I, Keyboard.Key.K);
 		Player2 = new(new(WINDOW_X-75, WINDOW_Y / 2), player2Controls);
+
+		orb = new(new(WINDOW_X / 2, WINDOW_Y / 2), Player1, Player2);
 
 		InitDrawableShapes();
 	}
@@ -45,13 +47,21 @@ public class Game
 
 	public void StartGame()
     {
-		while(true)
+		while(!GameEnded())
         {
 			Time.UpdateDeltaTime();
 
+			orb.Move();
 			GetInput();
 			DrawObjects();
         }
+
+		FinishGame();
+    }
+
+	private bool GameEnded()
+    {
+		return Player1.Loses >= LosesToLose || Player2.Loses >= LosesToLose;
     }
 
 	private void GetInput()
@@ -73,7 +83,16 @@ public class Game
 		window.Display();
     }
 
-	
+	private void FinishGame()
+    {
+		string Winner;
 
+		if (Player1.Loses >= LosesToLose)
+			Winner = "Second Player";
+		else
+			Winner = "First Player";
 
+		window.Close();
+		Console.WriteLine(Winner + " won, congratulations.");
+    }
 }

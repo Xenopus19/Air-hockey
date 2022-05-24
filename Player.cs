@@ -19,6 +19,8 @@ public struct Controls
 
 public class Player : CircleShape
 {
+	public int Loses;
+
 	private float Speed = 3f;
 	private Controls controls;
 	public Player(Vector2f pos, Controls controls)
