@@ -9,7 +9,9 @@ public class Game
 	public const int WINDOW_X = 800;
 	public const int WINDOW_Y = 600;
 
-	private const int LosesToLose = 1;
+	private const int LosesToLose = 5;
+
+	private RectangleShape BG;
 
 	private Player Player1;
 	private Player Player2;
@@ -24,6 +26,9 @@ public class Game
 	public Game()
 	{
 		window = new (new VideoMode(WINDOW_X, WINDOW_Y), "Air Hockey");
+		Textures.Load();
+		BG = new RectangleShape(new Vector2f(WINDOW_X, WINDOW_Y));
+		BG.Texture = Textures.BG;
 
 		Controls player1Controls = new Controls(Keyboard.Key.W, Keyboard.Key.S);
 		Player1 = new(new(50, WINDOW_Y / 2), player1Controls);
@@ -74,7 +79,7 @@ public class Game
 	private void DrawObjects()
     {
 		window.Clear();
-
+		BG.Draw(window, RenderStates.Default);
 		foreach(Shape shape in drawableShapes)
         {
 			shape.Draw(window, RenderStates.Default);

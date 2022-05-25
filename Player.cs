@@ -23,6 +23,8 @@ public class Player : CircleShape
 
 	private float Speed = 3f;
 	private Controls controls;
+
+	private Text ScoreText;
 	public Player(Vector2f pos, Controls controls)
 	{
 		this.controls = controls;
@@ -32,10 +34,10 @@ public class Player : CircleShape
 
 	private void InitGraphics()
     {
+		Texture = Textures.PlayerTexture;
 		Radius = 25;
-		OutlineColor = Color.White;
-		OutlineThickness = 3;
-		FillColor = Color.Black;
+		OutlineThickness = 0.2f;
+		FillColor = Color.White;
     }
 
 	public void GetInput()

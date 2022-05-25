@@ -68,7 +68,6 @@ public class Orb : CircleShape
     {
 		Direction *= -1;
 		Direction += new Vector2f(0.003f, 0.07f);
-		FillColor = Color.Blue;
     }
 
 	private void SetRandomDirection()
@@ -85,6 +84,7 @@ public class Orb : CircleShape
 
 	private void InitVisuals()
     {
+		Texture = Textures.OrbTexture;
 		Radius = 20;
 		FillColor = Color.White;
     }
