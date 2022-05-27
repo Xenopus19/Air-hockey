@@ -11,7 +11,6 @@ public static class Time
 
     public static void UpdateDeltaTime()
     {
-        Console.WriteLine(DeltaTime);
         DeltaTime = clock.ElapsedTime.AsMilliseconds();
         clock.Restart();
     }

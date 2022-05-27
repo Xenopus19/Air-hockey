@@ -20,15 +20,20 @@ public class Game
 
 	private RenderWindow window;
 
-	private List<Shape> drawableShapes;
+	private List<IDrawable> drawableShapes;
+	private List<Coin> coins;
+
+	private float CoinCooldown;
+	private float PassedCoinCooldown;
 
 
 	public Game()
 	{
 		window = new (new VideoMode(WINDOW_X, WINDOW_Y), "Air Hockey");
-		Textures.Load();
+		window.SetFramerateLimit(60);
+		Content.Load();
 		BG = new RectangleShape(new Vector2f(WINDOW_X, WINDOW_Y));
-		BG.Texture = Textures.BG;
+		BG.Texture = Content.BG;
 
 		Controls player1Controls = new Controls(Keyboard.Key.W, Keyboard.Key.S);
 		Player1 = new(new(50, WINDOW_Y / 2), player1Controls);
@@ -37,13 +42,17 @@ public class Game
 		Player2 = new(new(WINDOW_X-75, WINDOW_Y / 2), player2Controls);
 
 		orb = new(new(WINDOW_X / 2, WINDOW_Y / 2), Player1, Player2);
+		orb.OnTouchedGates += HandleGateCollision;
+		coins = new();
+		CoinCooldown = 2000;
+		PassedCoinCooldown = 0;
 
 		InitDrawableShapes();
 	}
 
 	private void InitDrawableShapes()
 	{
-		drawableShapes = new List<Shape>();
+		drawableShapes = new List<IDrawable>();
 
 		drawableShapes.Add(orb);
 		drawableShapes.Add(Player1);
@@ -57,11 +66,38 @@ public class Game
 			Time.UpdateDeltaTime();
 
 			orb.Move();
+			CheckCoinSpawnTime();
+			UpdateCoins();
 			GetInput();
 			DrawObjects();
         }
 
 		FinishGame();
+    }
+
+	private void UpdateCoins()
+    {
+		foreach(Coin coin in coins)
+        {
+			coin.CheckCollisionWithPlayer();
+        }
+    }
+
+	private void CheckCoinSpawnTime()
+    {
+		PassedCoinCooldown += Time.DeltaTime;
+		if(PassedCoinCooldown>=CoinCooldown)
+        {
+			SpawnCoin();
+			PassedCoinCooldown = 0;
+        }
+    }
+
+	private void SpawnCoin()
+    {
+		Coin coin = new(Player1, Player2);
+		drawableShapes.Add(coin);
+		coins.Add(coin);
     }
 
 	private bool GameEnded()
@@ -80,12 +116,31 @@ public class Game
     {
 		window.Clear();
 		BG.Draw(window, RenderStates.Default);
-		foreach(Shape shape in drawableShapes)
+		foreach(IDrawable shape in drawableShapes)
         {
-			shape.Draw(window, RenderStates.Default);
+			shape.Draw(window);
         }
 
 		window.Display();
+    }
+
+	private void HandleGateCollision(Player attacked)
+    {
+		if (attacked == Player1)
+			AddLoseToPlayer(Player1, Player2);
+		else
+			AddLoseToPlayer(Player2, Player1);
+    }
+
+	private void AddLoseToPlayer(Player attacked, Player other)
+    {
+		attacked.AddLoses();
+
+		if(other.CoinBonus)
+        {
+			other.CoinBonus = false;
+			attacked.AddLoses();
+        }
     }
 
 	private void FinishGame()

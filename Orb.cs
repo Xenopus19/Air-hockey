@@ -3,16 +3,21 @@ using SFML.Graphics;
 using SFML.System;
 
 namespace Aerohockey;
-public class Orb : CircleShape
+public class Orb : IDrawable
 {
+	public Action<Player> OnTouchedGates;
+
 	private Vector2f DefaultPosition;
 
-	private float Speed = 2f;
+	private float Speed = 1f;
 	private Vector2f Direction;
 
 	private List<Player> PlayerList;
+
+	private CircleShape OrbCircle;
 	public Orb(Vector2f defPosition, Player player1, Player player2)
 	{
+		OrbCircle = new();
 		PlayerList = new List<Player>();
 		PlayerList.Add(player1);
 		PlayerList.Add(player2);
@@ -23,46 +28,57 @@ public class Orb : CircleShape
 		InitVisuals();
 	}
 
+	public void Draw(RenderWindow renderWindow)
+    {
+		OrbCircle.Draw(renderWindow, RenderStates.Default);
+    }
+
 	public void Move()
     {
-		Position += Direction * Speed * Time.DeltaTime;
+		OrbCircle.Position += Direction * Speed * Time.DeltaTime;
 		CheckCollision();
     }
 
 	private void CheckCollision()
     {
-		bool CollidesWithScreenBorders = Position.Y <= 0 || Position.Y >= Game.WINDOW_Y - Radius * 2;
+		bool CollidesWithScreenBorders = OrbCircle.Position.Y <= 0 || OrbCircle.Position.Y >= Game.WINDOW_Y - OrbCircle.Radius * 2;
 		bool CollidesWithGates = CheckCollisionWithGates();
 		bool CollidesWithPlayers = false;
 
 		foreach(Player player in PlayerList)
         {
-			if(GetGlobalBounds().Intersects(player.GetGlobalBounds()))
+			if(OrbCircle.GetGlobalBounds().Intersects(player.GetGlobalBounds()))
 				CollidesWithPlayers = true;
         }
 
 		if (CollidesWithPlayers || CollidesWithScreenBorders || CollidesWithGates)
 			Bounce();
-		if (CollidesWithGates)
-			ReturnToDefaultPosition();
 
     }
 	
 	private bool CheckCollisionWithGates()
     {
-		if (Position.X <= 0)
+		if (OrbCircle.Position.X <= 0)
         {
-			PlayerList[0].Loses++;
+			InvokeTouchedGates(PlayerList[0]);
+			ReturnToDefaultPosition();
 			return true;
 		}
 			
-		else if(Position.X >= Game.WINDOW_X - Radius * 2)
+		else if(OrbCircle.Position.X >= Game.WINDOW_X - OrbCircle.Radius * 2)
         {
-			PlayerList[1].Loses++;
+			InvokeTouchedGates(PlayerList[1]);
+			ReturnToDefaultPosition();
 			return true;
 		}
 		return false;	
     }
+
+	private void InvokeTouchedGates(Player player)
+    {
+		if (OnTouchedGates != null)
+			OnTouchedGates.Invoke(player);
+	}
 
 	private void Bounce()
     {
@@ -79,13 +95,13 @@ public class Orb : CircleShape
 
 	private void ReturnToDefaultPosition()
     {
-		Position = DefaultPosition;
+		OrbCircle.Position = DefaultPosition;
     }
 
 	private void InitVisuals()
     {
-		Texture = Textures.OrbTexture;
-		Radius = 20;
-		FillColor = Color.White;
+		OrbCircle.Texture = Content.OrbTexture;
+		OrbCircle.Radius = 20;
+		OrbCircle.FillColor = Color.White;
     }
 }
