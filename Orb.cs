@@ -11,12 +11,14 @@ public class Orb : IDrawable
 
 	private float Speed = 1f;
 	private Vector2f Direction;
+	private Random random;
 
 	private List<Player> PlayerList;
 
 	private CircleShape OrbCircle;
 	public Orb(Vector2f defPosition, Player player1, Player player2)
 	{
+		random = new();
 		OrbCircle = new();
 		PlayerList = new List<Player>();
 		PlayerList.Add(player1);
@@ -83,14 +85,14 @@ public class Orb : IDrawable
 	private void Bounce()
     {
 		Direction *= -1;
-		Direction += new Vector2f(0.003f, 0.07f);
+		Vector2f DeltaDir = new Vector2f(0.003f, 0.07f);
+		if(random.Next(10)%2 == 0) DeltaDir *= -1;
+		Direction += DeltaDir;
     }
 
 	private void SetRandomDirection()
     {
-		Random r = new();
-
-		Direction = new((float)r.NextDouble(), 0);
+		Direction = new((float)random.NextDouble(), 0);
     }
 
 	private void ReturnToDefaultPosition()
