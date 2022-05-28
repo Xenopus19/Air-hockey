@@ -15,11 +15,11 @@ public class Orb : IDrawable
 
 	private List<Player> PlayerList;
 
-	private CircleShape OrbCircle;
+	private CircleShape sprite;
 	public Orb(Vector2f defPosition, Player player1, Player player2)
 	{
 		random = new();
-		OrbCircle = new();
+		sprite = new();
 		PlayerList = new List<Player>();
 		PlayerList.Add(player1);
 		PlayerList.Add(player2);
@@ -32,24 +32,24 @@ public class Orb : IDrawable
 
 	public void Draw(RenderWindow renderWindow)
     {
-		OrbCircle.Draw(renderWindow, RenderStates.Default);
+		sprite.Draw(renderWindow, RenderStates.Default);
     }
 
 	public void Move()
     {
-		OrbCircle.Position += Direction * Speed * Time.DeltaTime;
+		sprite.Position += Direction * Speed * Time.DeltaTime;
 		CheckCollision();
     }
 
 	private void CheckCollision()
     {
-		bool CollidesWithScreenBorders = OrbCircle.Position.Y <= 0 || OrbCircle.Position.Y >= Game.WINDOW_Y - OrbCircle.Radius * 2;
+		bool CollidesWithScreenBorders = sprite.Position.Y <= 0 || sprite.Position.Y >= Game.WINDOW_Y - sprite.Radius * 2;
 		bool CollidesWithGates = CheckCollisionWithGates();
 		bool CollidesWithPlayers = false;
 
 		foreach(Player player in PlayerList)
         {
-			if(OrbCircle.GetGlobalBounds().Intersects(player.GetGlobalBounds()))
+			if(sprite.GetGlobalBounds().Intersects(player.GetGlobalBounds()))
 				CollidesWithPlayers = true;
         }
 
@@ -60,14 +60,14 @@ public class Orb : IDrawable
 	
 	private bool CheckCollisionWithGates()
     {
-		if (OrbCircle.Position.X <= 0)
+		if (sprite.Position.X <= 0)
         {
 			InvokeTouchedGates(PlayerList[0]);
 			ReturnToDefaultPosition();
 			return true;
 		}
 			
-		else if(OrbCircle.Position.X >= Game.WINDOW_X - OrbCircle.Radius * 2)
+		else if(sprite.Position.X >= Game.WINDOW_X - sprite.Radius * 2)
         {
 			InvokeTouchedGates(PlayerList[1]);
 			ReturnToDefaultPosition();
@@ -85,7 +85,7 @@ public class Orb : IDrawable
 	private void Bounce()
     {
 		Direction *= -1;
-		Vector2f DeltaDir = new Vector2f(0.003f, 0.07f);
+		Vector2f DeltaDir = new Vector2f(0.04f, 0.07f);
 		if(random.Next(10)%2 == 0) DeltaDir *= -1;
 		Direction += DeltaDir;
     }
@@ -97,13 +97,13 @@ public class Orb : IDrawable
 
 	private void ReturnToDefaultPosition()
     {
-		OrbCircle.Position = DefaultPosition;
+		sprite.Position = DefaultPosition;
     }
 
 	private void InitVisuals()
     {
-		OrbCircle.Texture = Content.OrbTexture;
-		OrbCircle.Radius = 20;
-		OrbCircle.FillColor = Color.White;
+		sprite.Texture = Content.OrbTexture;
+		sprite.Radius = 20;
+		sprite.FillColor = Color.White;
     }
 }

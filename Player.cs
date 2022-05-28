@@ -28,13 +28,13 @@ public class Player : IDrawable
 
 	private Text ScoreText;
 
-	private CircleShape shape;
+	private CircleShape sprite;
 	public Player(Vector2f pos, Controls controls)
 	{
-		shape = new();
+		sprite = new();
 		ScoreText = new();
 		this.controls = controls;
-		shape.Position = pos;
+		sprite.Position = pos;
 		InitGraphics();
 	}
 	public void AddLoses()
@@ -45,43 +45,49 @@ public class Player : IDrawable
 
 	public void Draw(RenderWindow renderWindow)
     {
-		shape.Draw(renderWindow, RenderStates.Default);
+		sprite.Draw(renderWindow, RenderStates.Default);
 		ScoreText.Draw(renderWindow, RenderStates.Default);
     }
 
-	public FloatRect GetGlobalBounds() => shape.GetGlobalBounds();
+	public FloatRect GetGlobalBounds() => sprite.GetGlobalBounds();
 
-	public Vector2f GetPosition() => shape.Position;
+	public Vector2f GetPosition() => sprite.Position;
 
 	private void InitGraphics()
     {
-		ScoreText.Position = shape.Position;
+		ScoreText.Position = sprite.Position;
 		ScoreText.Color = Color.Red;
 		ScoreText.Font = Content.font;
 		ScoreText.CharacterSize = 40;
 		ScoreText.DisplayedString = Loses.ToString();
 
-		shape.Texture = Content.PlayerTexture;
-		shape.Radius = 25;
-		shape.OutlineThickness = 0.2f;
-		shape.FillColor = Color.White;
+		sprite.Texture = Content.PlayerTexture;
+		sprite.Radius = 25;
+		sprite.OutlineThickness = 0.2f;
+		sprite.FillColor = Color.White;
     }
 
 	public void GetInput()
     {
-		if(Keyboard.IsKeyPressed(controls.DownKey) && shape.Position.Y < Game.WINDOW_Y - shape.Radius *2)
-        {
-			Move(new Vector2f(0, 1) * Speed);
-        }
-		else if (Keyboard.IsKeyPressed(controls.UpKey) && shape.Position.Y > 0)
+		Move(GetEnteredDirection());
+	}
+
+	private Vector2f GetEnteredDirection()
+    {
+		if (Keyboard.IsKeyPressed(controls.DownKey) && sprite.Position.Y < Game.WINDOW_Y - sprite.Radius * 2)
 		{
-			Move(new Vector2f(0, -1) * Speed);
+			return new Vector2f(0, 1);
 		}
+		else if (Keyboard.IsKeyPressed(controls.UpKey) && sprite.Position.Y > 0)
+		{
+			return new Vector2f(0, -1);
+		}
+		return new Vector2f(0, 0);
 	}
 
 	private void Move(Vector2f Direction)
     {
-		shape.Position += Direction * Time.DeltaTime;
-		ScoreText.Position = shape.Position;
+		sprite.Position += Direction * Time.DeltaTime;
+		ScoreText.Position = sprite.Position;
     }
 }
