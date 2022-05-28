@@ -53,8 +53,10 @@ public class Orb : IDrawable
 				CollidesWithPlayers = true;
         }
 
-		if (CollidesWithPlayers || CollidesWithScreenBorders || CollidesWithGates)
-			Bounce();
+		if (CollidesWithPlayers || CollidesWithGates)
+			Bounce(true);
+		else if(CollidesWithScreenBorders )
+			Bounce(false);
 
     }
 	
@@ -82,12 +84,14 @@ public class Orb : IDrawable
 			OnTouchedGates.Invoke(player);
 	}
 
-	private void Bounce()
+	private void Bounce(bool ShouldReverceX)
     {
-		Direction *= -1;
-		Vector2f DeltaDir = new Vector2f(0.04f, 0.07f);
-		if(random.Next(10)%2 == 0) DeltaDir *= -1;
-		Direction += DeltaDir;
+		if (ShouldReverceX)
+			Direction.X *= -1;
+		else
+		    Direction.Y *= -1;
+
+		Direction += new Vector2f(0.02f, 0.02f);
     }
 
 	private void SetRandomDirection()
